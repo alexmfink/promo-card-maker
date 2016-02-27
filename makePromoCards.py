@@ -6,12 +6,10 @@
 # No copyright. No license. Don't care.
 #
 # NOTE: To use this, you will need Python and a LaTeX distribution.
-#       Commands are for Mac OS X, but should work on Linux, I think.
+#       Commands are for Mac OS X, but should work on Linux.
 #       Expansion to Windows should be pretty simple.
 #
-# To run: 
 #
-# 
 # This script is for generating sheets of cards, where each card has a unique
 # promotional code and a unique QR code image with a unique link. The original
 # intention is to generate promotional cards from Google PlayStore promo codes
@@ -21,7 +19,10 @@
 # change any layout stuff, even if you don't know anything about LaTeX, it
 # should be relatively easy. Sizes and positions are defined in the giant 
 # preambleEtc string; they are all in inches, since \unitlength is set to 1in.
-#
+# Cutting guide marks are also drawn, intruding slightly onto the cards at 
+# points; this seemed to work best using my printer. To use this script, at 
+# minimum you will need to change the variables after the import commands below.
+
 
 import os
 import sys
@@ -105,12 +106,22 @@ preambleEtc = \
 \\newcommand{\\QRRowTwo}{2.166667} 
 \\newcommand{\\QRRowThree}{4.166667}
 \\newcommand{\\QRRowFour}{6.166667}
-\\newcommand{\\QRColOne}{2.315}
-\\newcommand{\\QRColTwo}{5.940} 
-\\newcommand{\\QRColThree}{9.565}
+\\newcommand{\\QRColOne}{2.385}
+\\newcommand{\\QRColTwo}{6.010} 
+\\newcommand{\\QRColThree}{9.635}
 
 \\newcommand{\\QRWidth}{1.0in}
 \\newcommand{\\QRHeight}{1.0in}
+
+% Cutting marks
+\\newcommand{\\MarkColOne}{0}
+\\newcommand{\\MarkColTwo}{3.5625}
+\\newcommand{\\MarkColThree}{7.1875}
+\\newcommand{\\MarkColFour}{10.8125}
+\\newcommand{\\MarkRowOne}{0}
+\\newcommand{\\MarkRowTwo}{2}
+\\newcommand{\\MarkRowThree}{4}
+\\newcommand{\\MarkRowFour}{6}
 
 \\begin{document}
 \\setlength{\\unitlength}{1in}
@@ -142,6 +153,7 @@ def makePage(texFile, pageNum, codeList):
     writeQRLines(texFile,pageNum)
     writeGrfxLines(texFile, pageNum)
     writeCodeLines(texFile, pageNum, codeList)
+    writeMarkLines(texFile, pageNum)
     texFile.write("\\end{picture}\n")
     texFile.write("\\newpage\n")
 
@@ -177,6 +189,17 @@ def writeCodeLines(texFile, pageNum, codeList):
             texFile.write("\\put("+cdc[c1]+","+cdr[r1]+"){"+codeList[codeNum]+ \
                 "}\n")
             codeNum = codeNum + 1
+
+def writeMarkLines(texFile, pageNum):
+    mc = ["\\MarkColOne", "\\MarkColTwo", "\\MarkColThree", "\\MarkColFour"]
+    mr = ["\\MarkRowOne", "\\MarkRowTwo", "\\MarkRowThree", "\\MarkRowFour"]
+    texFile.write("% Cutting Marks\n")
+    for c1 in range(4):
+        texFile.write("\\put("+mc[c1]+",-1){\\line(0,1){0.9}}\n")
+        texFile.write("\\put("+mc[c1]+",9){\\line(0,-1){1.05}}\n")
+    for r1 in range(4):
+        texFile.write("\\put(-1,"+mr[r1]+"){\\line(1,0){1.05}}\n")
+        texFile.write("\\put(11.75,"+mr[r1]+"){\\line(-1,0){1.05}}\n")
 
 def main():
     
